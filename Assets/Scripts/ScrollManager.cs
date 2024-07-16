@@ -8,13 +8,16 @@ public class ScrollManager : MonoBehaviour, IDragHandler, IBeginDragHandler, IEn
 {
 
     public Scrollbar scrollbar;
-    public GameObject[] mainTools;
 
     const int SIZE = 4; 
     float distance;
     float[] pos = new float[SIZE];
+    public GameObject[] pages;
     int curPos, targetPos;
     bool isDrag;
+
+    // 툴 변경
+    public GameObject[] mainTools;
 
     void Start()
     {
@@ -59,8 +62,17 @@ public class ScrollManager : MonoBehaviour, IDragHandler, IBeginDragHandler, IEn
             if (targetPos<0) targetPos=0;
             scrollbar.value = Mathf.Lerp(scrollbar.value, pos[targetPos], 0.1f);
 
+            // 툴 변경
             mainTools[curPos].SetActive(false);
             mainTools[targetPos].SetActive(true);
+
+            // 버튼 깨우기
+            for (int i = 0 ; i < pages[curPos].transform.childCount ; i++){
+                pages[curPos].transform.GetChild(i).gameObject.SetActive(false);
+            }
+            for (int i = 0 ; i < pages[targetPos].transform.childCount ; i++){
+                pages[targetPos].transform.GetChild(i).gameObject.SetActive(true);
+            }
         }
     }
 }

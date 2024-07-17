@@ -3,41 +3,41 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class Eyehandler : MonoBehaviour
+public class CharacterManager : MonoBehaviour
 {
 
     // 눈동자
-    public Transform eye;
+    public Transform eyes;
+    float eyesMaxX = 0.1f;
+    float eyesMaxY = 0.1f;
+    private Vector3 eyesInitialPosition;
 
-    // 눈동자 최대 x, y 값
-    float maxX = 0.1f;
-    float maxY = 0.1f;
-
-    private Vector3 initialPosition;
+    // 포만감
+    public static float fullness = 0;
 
     void Start()
     {
-        initialPosition = eye.localPosition;
+        eyesInitialPosition = eyes.localPosition;
         
     }
 
-    // 임시코드.. 언젠가 수정
     void Update()
     {
 
+        // 시선 따라가기. 임시코드.. 언젠가 수정
         if (Input.GetMouseButton(0))
         {
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3 targetPosition = new Vector3(mousePosition.x, mousePosition.y, initialPosition.z);
+            Vector3 eyesTargetPosition = new Vector3(mousePosition.x, mousePosition.y, eyesInitialPosition.z);
 
             // 타겟 위치 제한
-            targetPosition.x = Mathf.Clamp(targetPosition.x, initialPosition.x - maxX, initialPosition.x + maxX);
-            targetPosition.y = Mathf.Clamp(targetPosition.y, initialPosition.y - maxY, initialPosition.y + maxY);
+            eyesTargetPosition.x = Mathf.Clamp(eyesTargetPosition.x, eyesInitialPosition.x - eyesMaxX, eyesInitialPosition.x + eyesMaxX);
+            eyesTargetPosition.y = Mathf.Clamp(eyesTargetPosition.y, eyesInitialPosition.y - eyesMaxY, eyesInitialPosition.y + eyesMaxY);
 
-            eye.localPosition = Vector2.Lerp(eye.localPosition, targetPosition, 0.05f);
+            eyes.localPosition = Vector2.Lerp(eyes.localPosition, eyesTargetPosition, 0.05f);
 
         }else{
-            eye.localPosition = Vector2.Lerp(eye.localPosition, new Vector2(0,0), 0.05f);
+            eyes.localPosition = Vector2.Lerp(eyes.localPosition, new Vector2(0,0), 0.05f);
         }
 
     }

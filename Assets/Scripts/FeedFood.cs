@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -7,28 +8,26 @@ using UnityEngine.UI;
 public class FeedFood : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
 
-    public GameObject curFood; 
-    public Transform parent;
-    public Sprite[] foods;
-    float[] satiety;  // 음식 별 포만도
-    int[] foodCounts; // 남은 음식 개수
-    int foodIdx = 0;
+    public GameObject curFood;  // 현재 선택된 음식. sprite 변경으로 화면에 뿌려줌
+    public Transform parent;    // 드래그한 food instance 부모인데 굳이 필요한진 모르겠다.
+    int foodIdx = 0;    // 얘가 고정이 되었으면 하는디 
+
+    string path = "Food/";
 
     GameObject instanceFood;
     public Image fullnessBar;
     public TextMeshProUGUI foodCount;
 
-    private void Start() {
-        // 임시 초기화 코드
-        satiety = new float[foods.Length];
-        satiety[0] = 0.2f;
-        satiety[1] = 0.3f;
+    Food[] Foods;
 
-        foodCounts = new int[foods.Length];
-        foodCounts[0] = 10;
-        foodCounts[1] = 8;
+    private void Start()
+    {
 
-        foodCount.text = "x" + foodCounts[foodIdx].ToString();
+        Foods = DataManager.instance.userData.foods;
+        print(Resources.Load<Sprite>(path + Foods[foodIdx].name));
+        curFood.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>(path + Foods[foodIdx].name);
+
+        foodCount.text = "x" + Foods[foodIdx].count.ToString();
     }
 
     /** 음식 끌어다 주기 */
@@ -40,7 +39,7 @@ public class FeedFood : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDrag
     public void OnDrag(PointerEventData eventData)
     {
         Vector3 v = Camera.main.ScreenToWorldPoint(eventData.position);
-        v.Set(v.x,v.y,0);
+        v.Set(v.x, v.y, 0);
         instanceFood.transform.position = v;
     }
 
@@ -48,28 +47,36 @@ public class FeedFood : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDrag
     {
         Vector3 now = Camera.main.ScreenToWorldPoint(eventData.position); // 드래그 끝나는 지점
 
-        if (now.x < 1.3 && now.x > -1.3 && now.y > -1.6 && now.y < 1){  // 캐릭터한테 준 경우
-            if(CharacterManager.fullness < 1){
-                CharacterManager.fullness = Math.Min(1, CharacterManager.fullness + satiety[foodIdx]);
-                fullnessBar.fillAmount = CharacterManager.fullness;
-                fullnessBar.color = CharacterManager.fullness < 0.4 ? Color.red : CharacterManager.fullness < 0.7 ? Color.yellow : Color.green;
-                foodCount.text = "x" + (--foodCounts[foodIdx]).ToString();
-            }    
+        if (now.x < 1.3 && now.x > -1.3 && now.y > -1.6 && now.y < 1)
+        {  // 캐릭터한테 준 경우
+            if (DataManager.instance.userData.fullness < 1)
+            {
+                DataManager.instance.userData.fullness = Math.Min(1, DataManager.instance.userData.fullness + Foods[foodIdx].satiety);
+                fullnessBar.fillAmount = DataManager.instance.userData.fullness;
+                fullnessBar.color = DataManager.instance.userData.fullness < 0.4 ? Color.red : DataManager.instance.userData.fullness < 0.7 ? Color.yellow : Color.green;
+                foodCount.text = "x" + (--Foods[foodIdx].count).ToString();
+                DataManager.instance.saveData();
+            }
         }
         Destroy(instanceFood);
     }
 
     /** 음식 선택 */
-    public void nextFood(){
-        foodIdx = Math.Clamp(foodIdx+1, 0, foods.Length-1);
-        curFood.GetComponent<SpriteRenderer>().sprite = foods[foodIdx];
-        foodCount.text = "x" + foodCounts[foodIdx].ToString();
+    public void nextFood()
+    {
+        foodIdx = Math.Clamp(foodIdx + 1, 0, Foods.Length - 1);
+        // curFood.GetComponent<SpriteRenderer>().sprite = foods[foodIdx];
+        curFood.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>(path + Foods[foodIdx].name);
+        foodCount.text = "x" + Foods[foodIdx].count.ToString();
+
     }
 
-    public void preFood(){
-        foodIdx = Math.Clamp(foodIdx-1, 0, foods.Length-1);
-        curFood.GetComponent<SpriteRenderer>().sprite = foods[foodIdx];
-        foodCount.text = "x" + foodCounts[foodIdx].ToString();
+    public void preFood()
+    {
+        foodIdx = Math.Clamp(foodIdx - 1, 0, Foods.Length - 1);
+        // curFood.GetComponent<SpriteRenderer>().sprite = foods[foodIdx];
+        curFood.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>(path + Foods[foodIdx].name);
+        foodCount.text = "x" + Foods[foodIdx].count.ToString();
     }
 
 }

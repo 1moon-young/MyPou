@@ -12,9 +12,6 @@ public class CharacterManager : MonoBehaviour
     float eyesMaxY = 0.1f;
     private Vector3 eyesInitialPosition;
 
-    // 포만감
-    public static float fullness = 0;
-
     void Start()
     {
         eyesInitialPosition = eyes.localPosition;

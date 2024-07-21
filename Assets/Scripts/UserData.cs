@@ -1,4 +1,8 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Threading;
+using UnityEngine;
 
 [Serializable]
 public class UserData{
@@ -6,10 +10,14 @@ public class UserData{
     public float fullness;
     public Food[] foods;
 
+    public static int count = 1;
+
     public UserData(){
-        foods = null;
-        fullness = 0;
-        coin = 0;
+        this.foods = null;
+        this.fullness = 0;
+        this.coin = 50;
+        // Debug.Log("생성자 호출" + count++);
     }
+
 }
 

@@ -10,7 +10,7 @@ public class DataManager : MonoBehaviour
     string path;
     string filename = "save";
 
-    public UserData userData = new UserData();
+    public UserData userData;
 
     private void Awake()
     {
@@ -19,8 +19,11 @@ public class DataManager : MonoBehaviour
         else if (instance != this)
             Destroy(instance.gameObject);
         DontDestroyOnLoad(this.gameObject);
+        //
 
+        userData = new UserData();
         path = Application.persistentDataPath;
+        print(userData.coin);
         print(path);
         initialize();
     }
@@ -36,6 +39,8 @@ public class DataManager : MonoBehaviour
     public void saveData(){
         string jsonData = JsonUtility.ToJson(userData, true);
         File.WriteAllText(path + filename, jsonData);
+        Debug.Log("save: " + userData.foods[0].count);
+        Debug.Log("세이브됨");
     }
 
     public void saveFoodData(Food[] foods){
